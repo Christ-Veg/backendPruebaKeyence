@@ -1,46 +1,46 @@
 const { faker } = require('@faker-js/faker');
 const boom = require('@hapi/boom');
+const reader = require('xlsx');
+const { models } = require('../libs/sequelize');
 
 class AssistancesService{
-  constructor(){
-    this.assistance = [];
-    this.generate();
-  }
+  constructor(){ }
 
-  async generate(){
-    const limit = 100;
-    for(let index=0; index<limit; index++){
-      this.assistance.push({
-        id: faker.string.uuid(),
-        employeeName: faker.person.fullName(),
-        fecha: faker.date.past(),
-        isBlock: faker.datatype.boolean()
-      })
-    }
-  }
-  async create(){
-
+  async create(data){
+    const newAssistance = await models.Assistance.create(data);
+    return newAssistance;
   }
 
   async find(){
-    return new Promise((resolve, reject)=>{
-      resolve(this.assistance)
-    });
+    const rta = await models.Assistance.findAll();
+    return rta;
   }
 
   async findOne(idEmployee){
-    const assistance = this.assistance.find(item => item.id === idEmployee);
-    if(!assistance){
-      throw boom.notFound('Product not found');
-    }
-    if(assistance.isBlock){
-      throw boom.conflict('Product is block');
-    }
-    return assistance;
+    const employee = await models.Assistance.findAll({
+      where:{
+        employeeid:idEmployee
+      },
+    });
+    return employee;
   }
 
-  async update(){
+  async update(idEmployee,date,body){
+    const employee = await models.Assistance.findOne({
+      where:{
+        employeeid:idEmployee,
+        fecha:date,
+      },
+    });
+    employee.salida= body.salida;
+    await employee.save();
+    return employee;
+  }
 
+  import(data){
+    const file = reader.readFile(data);
+    const name = file.SheetNames;
+    return name;
   }
 
   async delete(){
