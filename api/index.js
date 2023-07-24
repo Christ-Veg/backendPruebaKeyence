@@ -7,7 +7,7 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req,res)=>{
+app.get('/api', (req,res)=>{
   res.send('Servicio disponible');
 });
 
